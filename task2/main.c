@@ -28,20 +28,22 @@ int currentID;
 Stack freeInd;
 
 char *getword(FILE *in) {
-	char *slark = (char *)malloc(0 * sizeof(char));
+	getc(in);
+	char *word = (char *)malloc(0 * sizeof(char));
 	char c = fgetc(in);
 	int i = 0, j = 0;
 	while ((c != ' ') && (c != '\n') && (c != EOF)) {
 		if (j % 64 == 0) {
 			j++;
-			slark = (char *)realloc(slark, j * 64 * sizeof(char));
+			word = (char *)realloc(word, j * 64 * sizeof(char));
 		}
-		slark[i] = c;
+		word[i] = c;
 		i++;
 		c = fgetc(in);
 	}
-	slark[i] = '\0';
-	return slark;
+	word[i] = '\0';
+	ungetc(' ', in);
+	return word;
 }
 
 bool inputIsCorrect(char *input) {
