@@ -4,22 +4,22 @@
 #include <stdbool.h>
 #include <ctype.h>
 
-struct Note {
+typedef struct {
 	int id;
 	char *name;
 	char *nmbr;
-};
+}Note;
 
-struct DataBase {
+typedef struct {
 	int size;
 	Note *contact;
-};
+}DataBase;
 
-struct Stack {
+typedef struct {
 	int *num;
 	int top;
 	int size;
-};
+}Stack;
 
 FILE *data;
 const char *nameOfFile;
@@ -125,7 +125,7 @@ void create(char *name, char *number) {
 	else {
 		phBook.contact[phBook.size].id = currentID;
 		phBook.contact[phBook.size].name = name;
-		phBook.contact[phBook.size].id = currentID;
+		phBook.contact[phBook.size].nmbr = number;
 		phBook.size++;
 		fprintf(data, "%d, %s %s\n", currentID++, name, number);
 		return;
