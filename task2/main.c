@@ -185,12 +185,15 @@ void change(int id, char *cmd, char *input) {
 int main(int argc, char * argv[]) {
 	nameOfFile = argv[1];
 	data = fopen(nameOfFile, "a+");
+	if (data == NULL)
+		perror("Error");
 	phBook.size = 0;
 	phBook.contact = (Note *)malloc(phBook.size * sizeof(Note));
 	freeInd.top = 0;
 	freeInd.size = 1;
 	freeInd.num = (int *)malloc(freeInd.size * sizeof(int));
-	int id, idmax = 0;
+	int id;
+	rewind(data);
 	while (fscanf(data, "%d", &id) == 1) {
 		phBook.size++;
 		phBook.contact = (Note *)realloc(phBook.contact, phBook.size * sizeof(Note));
@@ -235,9 +238,6 @@ int main(int argc, char * argv[]) {
 			free(phBook.contact);
 			free(freeInd.num);
 			free(cmd);
-			free(input);
-			free(name);
-			free(number);
 		}
 		else {
 
