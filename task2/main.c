@@ -1,6 +1,3 @@
-// task2.cpp: определяет точку входа для консольного приложения.
-//
-
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -246,4 +243,3 @@ int main(int argc, char * argv[]) {
 	}
 	return 0;
 }
-
