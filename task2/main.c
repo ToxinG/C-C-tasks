@@ -28,7 +28,6 @@ int currentID;
 Stack freeInd;
 
 char *getword(FILE *in) {
-	getc(in);
 	char *word = (char *)malloc(0 * sizeof(char));
 	char c = fgetc(in);
 	int i = 0, j = 0;
@@ -42,12 +41,11 @@ char *getword(FILE *in) {
 		c = fgetc(in);
 	}
 	word[i] = '\0';
-	ungetc(' ', in);
 	return word;
 }
 
 bool inputIsCorrect(char *input) {
-	if (input == "") {
+	if (!strcmp(input, "")) {
 		printf("Error: input is missing.\n");
 		return false;
 	}
@@ -166,12 +164,12 @@ void change(int id, char *cmd, char *input) {
 		}
 	}
 	if (x >= 0) {
-		if (cmd == "number")
+		if (!strcmp(cmd, "number"))
 			strcpy(phBook.contact[x].nmbr, input);
-		else if (cmd == "name")
+		else if (!strcmp(cmd, "name"))
 			strcpy(phBook.contact[x].name, input);
 		else {
-			printf("Error: failed to identify the command.\n");
+			printf("Error: unknown command.\n");
 			return;
 		}
 		for (int i = 0; i < phBook.size; i++) {
@@ -192,8 +190,8 @@ int main(int argc, char * argv[]) {
 	freeInd.top = 0;
 	freeInd.size = 1;
 	freeInd.num = (int *)malloc(freeInd.size * sizeof(int));
-	int id;
 	rewind(data);
+	int id;
 	while (fscanf(data, "%d", &id) == 1) {
 		phBook.size++;
 		phBook.contact = (Note *)realloc(phBook.contact, phBook.size * sizeof(Note));
@@ -205,43 +203,45 @@ int main(int argc, char * argv[]) {
 		currentID = 1;
 	else
 		currentID = phBook.contact[phBook.size - 1].id + 1;
-	char *cmd = (char *)malloc(8 * sizeof(char));
-	char *name, *number, *input;
+	char *cmd, *name, *number, *input;
 	while (0 == 0) {
-		scanf("%s", cmd);
-		if (cmd == "find") {
+		cmd = getword(stdin);
+		if (!strcmp(cmd, "find")) {
 			input = getword(stdin);
 			if (inputIsCorrect(input))
 				find(input);
 			free(input);
 		}
-		else if (cmd == "create") {
+		else if (!strcmp(cmd, "create")) {
 			name = getword(stdin);
 			number = getword(stdin);
-			create(name, number);
+			if (inputIsCorrect(name) && inputIsCorrect(number))
+				create(name, number);
 			free(name);
 			free(number);
 		}
-		else if (cmd == "delete") {
+		else if (!strcmp(cmd, "delete")) {
 			scanf("%d", &id);
 			del(id);
 		}
-		else if (cmd == "change") {
+		else if (!strcmp(cmd, "change")) {
 			scanf("%d %s", &id, cmd);
 			input = getword(stdin);
 			if (inputIsCorrect(input))
 				change(id, cmd, input);
 			free(input);
 		}
-		else if (cmd == "exit") {
+		else if (!strcmp(cmd, "exit")) {
 			fclose(data);
 			free(phBook.contact);
 			free(freeInd.num);
 			free(cmd);
+			return 0;
 		}
 		else {
-
+			printf("Unknown command.\n");
 		}
+		free(cmd);
 	}
-	return 0;
+	fflush(stdout);
 }
