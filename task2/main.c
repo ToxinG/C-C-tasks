@@ -90,12 +90,22 @@ char *unify(char *input) {
     return ans;
 }
 
+void update() {
+    freopen(nameOfFile, "w", data);
+    for (int i = 0; i < phBook.size; i++) {
+        if (phBook.contact[i].id)
+            fprintf(data, "%d %s %s\n", phBook.contact[i].id, phBook.contact[i].name, phBook.contact[i].nmbr);
+    }
+    freopen(nameOfFile, "a+", data);
+    return;
+}
+
 void find(char *input) {
     bool ans = false;
     input = unify(input);
     if (isdigit(input[0])) {
         for (int i = 0; i < phBook.size; i++) {
-            if ((phBook.contact[i].id > 0) && (unify(phBook.contact[i].nmbr) == input)) {
+            if ((phBook.contact[i].id > 0) && (!strcmp(unify(phBook.contact[i].nmbr), input))) {
                 printf("%d %s %s\n", phBook.contact[i].id, phBook.contact[i].name, phBook.contact[i].nmbr);
                 ans = true;
             }
@@ -103,14 +113,14 @@ void find(char *input) {
     }
     else {
         for (int i = 0; i < phBook.size; i++) {
-            if ((phBook.contact[i].id > 0) && (strstr(unify(phBook.contact[i].name), input))) {
+            if ((phBook.contact[i].id > 0) && (!strstr(unify(phBook.contact[i].name), input))) {
                 printf("%d %s %s\n", phBook.contact[i].id, phBook.contact[i].name, phBook.contact[i].nmbr);
                 ans = true;
             }
         }
     }
     if (ans == false) {
-        printf("Error: no contacts with given informaion have been found.\n");
+        printf("Error: no contacts with given information have been found.\n");
     }
     return;
 }
@@ -123,10 +133,11 @@ void create(char *name, char *number) {
         freeInd.top--;
     }
     else {
-        phBook.contact[phBook.size].id = currentID;
-        phBook.contact[phBook.size].name = name;
-        phBook.contact[phBook.size].nmbr = number;
         phBook.size++;
+        phBook.contact = realloc(phBook.contact, phBook.size * sizeof(Note));
+        phBook.contact[phBook.size - 1].id = currentID;
+        phBook.contact[phBook.size - 1].name = name;
+        phBook.contact[phBook.size - 1].nmbr = number;
         fprintf(data, "%d %s %s\n", currentID++, name, number);
         return;
     }
@@ -147,10 +158,7 @@ void del(int id) {
             freeInd.size *= 2;
             freeInd.num = (int *)realloc(freeInd.num, freeInd.size * sizeof(int));
         }
-        for (int i = 0; i < phBook.size; i++) {
-            if (phBook.contact[i].id > 0)
-                fprintf(data, "%d %s %s\n", phBook.contact[i].id, phBook.contact[i].name, phBook.contact[i].nmbr);
-        }
+        update();
         return;
     }
 }
@@ -172,10 +180,7 @@ void change(int id, char *cmd, char *input) {
             printf("Error: unknown command.\n");
             return;
         }
-        for (int i = 0; i < phBook.size; i++) {
-            if (phBook.contact[i].id > 0)
-                fprintf(data, "%d %s %s\n", phBook.contact[i].id, phBook.contact[i].name, phBook.contact[i].nmbr);
-        }
+        update();
     }
     return;
 }
@@ -186,7 +191,7 @@ int main(int argc, char * argv[]) {
     if (data == NULL)
         perror("Error");
     phBook.size = 0;
-    phBook.contact = malloc(1 * sizeof(Note));
+    phBook.contact = malloc(phBook.size * sizeof(Note));
     freeInd.top = 0;
     freeInd.size = 1;
     freeInd.num = (int *)malloc(freeInd.size * sizeof(int));
@@ -217,15 +222,14 @@ int main(int argc, char * argv[]) {
             number = getword(stdin);
             if (inputIsCorrect(name) && inputIsCorrect(number))
                 create(name, number);
-            free(name);
-            free(number);
         }
         else if (!strcmp(cmd, "delete")) {
-            scanf("%d", &id);
+            scanf("%d\n", &id);
             del(id);
         }
         else if (!strcmp(cmd, "change")) {
-            scanf("%d %s", &id, cmd);
+            scanf("%d ", &id);
+            cmd = getword(stdin);
             input = getword(stdin);
             if (inputIsCorrect(input))
                 change(id, cmd, input);
