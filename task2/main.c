@@ -113,7 +113,7 @@ void find(char *input) {
     }
     else {
         for (int i = 0; i < phBook.size; i++) {
-            if ((phBook.contact[i].id > 0) && (!strstr(unify(phBook.contact[i].name), input))) {
+            if ((phBook.contact[i].id > 0) && (strstr(unify(phBook.contact[i].name), input))) {
                 printf("%d %s %s\n", phBook.contact[i].id, phBook.contact[i].name, phBook.contact[i].nmbr);
                 ans = true;
             }
