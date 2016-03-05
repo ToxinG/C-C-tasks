@@ -32,13 +32,17 @@ char *getword(FILE *in) {
     char c = fgetc(in);
     int i = 0, j = 0;
     while ((c != ' ') && (c != '\n') && (c != EOF)) {
-        if (j % 64 == 0) {
+        if (i % 64 == 0) {
             j++;
             word = realloc(word, j * 64 * sizeof(char));
         }
         word[i] = c;
         i++;
         c = fgetc(in);
+    }
+    if (i % 64 == 0) {
+        j++;
+        word = realloc(word, j * 64 * sizeof(char));
     }
     word[i] = '\0';
     return word;
