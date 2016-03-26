@@ -4,11 +4,17 @@
 using namespace std;
 
 int Rational::gcd(int a, int b) const {
+    int sign = 1;
+    if (a < 0) {
+        sign = -1;
+        a *= -1;
+    }
     while (a != 0 && b != 0)
         if (a < b)
             a = a % b;
         else
             b = b % a;
+    a *= sign;
     return (a + b);
 }
 
@@ -26,26 +32,44 @@ int Rational::getNum()const {
 int Rational::getDenom()const {
     return denom;
 }
-Rational Rational::operator +(Rational const & x) const {
+Rational Rational::operator +(const Rational & x) const {
     int resNum = num * x.denom + x.num * denom;
     int resDenom = denom * x.denom;
-    resNum = resNum / gcd(resNum, resDenom);
-    resDenom = resDenom / gcd(resNum, resDenom);
-    return Rational(resNum, resDenom);
+    if ((resNum >= 0 && resDenom < 0) || (resNum < 0 && resDenom < 0)) {
+        resNum *= -1;
+        resDenom *= -1;
+    }
+    Rational res = Rational(resNum / gcd(resNum, resDenom), resDenom / gcd(resNum, resDenom));
+    return res;
 }
 
-Rational Rational::operator -(Rational const & x) const {
+Rational Rational::operator -(const Rational & x) const {
     int resNum = num * x.denom - x.num * denom;
     int resDenom = denom * x.denom;
-    resNum = resNum / gcd(resNum, resDenom);
-    resDenom = resDenom / gcd(resNum, resDenom);
-    return Rational(resNum, resDenom);
+    if ((resNum >= 0 && resDenom < 0) || (resNum < 0 && resDenom < 0)) {
+        resNum *= -1;
+        resDenom *= -1;
+    }
+    Rational res = Rational(resNum / gcd(resNum, resDenom), resDenom / gcd(resNum, resDenom));
+    return res;
 }
-Rational Rational::operator *(Rational const & x) const {
-    return Rational(num * x.num / gcd(num * x.num, denom * x.denom),
-                    denom * x.denom / gcd(num * x.num, denom * x.denom));
+Rational Rational::operator *(const Rational & x) const {
+    int resNum = num * x.num;
+    int resDenom = denom * x.denom;
+    if ((resNum >= 0 && resDenom < 0) || (resNum < 0 && resDenom < 0)) {
+        resNum *= -1;
+        resDenom *= -1;
+    }
+    Rational res = Rational(resNum / gcd(resNum, resDenom), resDenom / gcd(resNum, resDenom));
+    return res;
 }
-Rational Rational::operator /(Rational const & x) const {
-    return Rational(num * x.denom / gcd(num * x.denom, denom * x.num),
-                    denom * x.num / gcd(num * x.denom, denom * x.num));
+Rational Rational::operator /(const Rational & x) const {
+    int resNum = num * x.denom;
+    int resDenom = denom * x.num;
+    if ((resNum >= 0 && resDenom < 0) || (resNum < 0 && resDenom < 0)) {
+        resNum *= -1;
+        resDenom *= -1;
+    }
+    Rational res = Rational(resNum / gcd(resNum, resDenom), resDenom / gcd(resNum, resDenom));
+    return res;
 }
