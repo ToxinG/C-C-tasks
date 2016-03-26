@@ -1,22 +1,22 @@
 #ifndef RATIONAL_RATIONAL_H
 #define RATIONAL_RATIONAL_H
 
-class Rational {
+class rational {
 private:
     int num;
     int denom;
     int gcd (int a, int b) const;
 
 public:
-    Rational(int);
-    Rational(int, int);
+    rational(int);
+    rational(int, int);
     int getNum()const;
     int getDenom()const;
-    Rational operator +(Rational const &) const;
-    Rational operator -(Rational const &) const;
-    Rational operator *(Rational const &) const;
-    Rational operator /(Rational const &) const;
+    rational operator +(rational const &) const;
+    rational operator -(rational const &) const;
+    rational operator *(rational const &) const;
+    rational operator /(rational const &) const;
 
 };
 
-#endif //RATIONAL_RATIONAL_H
+#endif //RATIONAL_rATIONAL_H
