@@ -3,7 +3,7 @@
 
 using namespace std;
 
-int gcd(int a, int b) {
+int Rational::gcd(int a, int b) const {
     while (a != 0 && b != 0)
         if (a < b)
             a = a % b;
@@ -48,9 +48,4 @@ Rational Rational::operator *(Rational const & x) const {
 Rational Rational::operator /(Rational const & x) const {
     return Rational(num * x.denom / gcd(num * x.denom, denom * x.num),
                     denom * x.num / gcd(num * x.denom, denom * x.num));
-}
-
-int main() {
-
-    return 0;
 }
