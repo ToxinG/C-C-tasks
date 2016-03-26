@@ -4,17 +4,14 @@
 using namespace std;
 
 int Rational::gcd(int a, int b) const {
-    int sign = 1;
     if (a < 0) {
-        sign = -1;
-        a *= -1;
+        a *= -a;
     }
     while (a != 0 && b != 0)
         if (a < b)
             a = a % b;
         else
             b = b % a;
-    a *= sign;
     return (a + b);
 }
 
@@ -23,6 +20,10 @@ Rational::Rational(int aNum) {
     denom = 1;
 }
 Rational::Rational(int aNum, int aDenom) {
+    if ((aNum >= 0 && aDenom < 0) || (aNum < 0 && aDenom < 0)) {
+        aNum *= -1;
+        aDenom *= -1;
+    }
     num = aNum / gcd(aNum, aDenom);
     denom = aDenom / gcd(aNum, aDenom);
 }
