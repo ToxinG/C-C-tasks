@@ -1,7 +1,3 @@
-//
-// Created by Антон on 05.03.2016.
-//
-
 #ifndef RATIONAL_RATIONAL_H
 #define RATIONAL_RATIONAL_H
 
@@ -9,6 +5,7 @@ class Rational {
 private:
     int num;
     int denom;
+    int gcd (int a, int b) const;
 
 public:
     Rational(int);
