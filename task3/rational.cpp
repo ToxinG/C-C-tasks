@@ -5,7 +5,7 @@ using namespace std;
 
 int rational::gcd(int a, int b) const {
     if (a < 0) {
-        a *= -a;
+        a = -a;
     }
     while (a != 0 && b != 0)
         if (a < b)
