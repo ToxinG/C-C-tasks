@@ -153,7 +153,7 @@ namespace Format {
             }
             case h: {
                 unsigned short int newNumber = (unsigned short int) number;
-                snprintf(charNumber, 20, "%hu", newNumber); //stringNumber = to_string(newNumber);
+                snprintf(charNumber, 20, "%hu", newNumber);
                 stringNumber = charNumber;
                 stringNumber = toOctHex(prototype, newNumber, stringNumber);
                 break;
@@ -324,6 +324,9 @@ namespace Format {
 
         return answer;
     };
+}
+
+using namespace Format;
 
     template<typename ... Args>
     string format(string const &format, Args ... args) {
@@ -331,6 +334,5 @@ namespace Format {
         string answer = toString(false, x, format, args...);
         return answer;
     }
-};
 
 #endif //TASK4_FORMAT_H
