@@ -4,7 +4,7 @@ project(format)
 
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11")
 
-set(SOURCE_FILES format.cpp)
+set(SOURCE_FILES format.cpp Test.cpp)
 
 add_library(format ${SOURCE_FILES})
 

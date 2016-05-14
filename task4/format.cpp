@@ -236,4 +236,19 @@ namespace Format {
         }
         return answer;
     }
+
+    string toString(bool starMode, formatType prototype, string const &format) {
+        string answer;
+        while (true) { //вывод все что перед процентом
+            if (format[index] == '%' && format[index + 1] == '%') {
+                answer += "%";
+                index += 2;
+            }
+            if (index == format.length()) {
+                return answer;
+            }
+            answer += format[index];
+            index++;
+        }
+    }
 }

@@ -10,6 +10,7 @@
 #include <cstdlib>
 #include <sstream>
 #include <stdexcept>
+#include <string>
 
 using namespace std;
 
@@ -285,9 +286,11 @@ namespace Format {
             return lvlOfString(prototype, stringNumber);
         }
         if (prototype.spec == s) {
-            return lvlOfString(prototype, variable);
+            return lvlOfString(prototype, stringNumber);
         }
     }
+
+    string toString(bool starMode, formatType prototype, string const &format);
 
     template<typename T, typename... Args>
     string toString(bool starMode, formatType prototype, string const &format, T first, Args ... args) {
@@ -311,11 +314,11 @@ namespace Format {
         //cout << prototype.width << endl;
         //cout << prototype.spec << endl;
         if (prototype.width == -42) {
-            prototype.width = (int) first;
+            prototype.width = first;
             answer += toString(true, prototype, format, args...);
         }
         if (prototype.precision == -42) {
-            prototype.precision = (int) first;
+            prototype.precision = first;
             answer += toString(true, prototype, format, args...);
         }
 
@@ -331,6 +334,8 @@ using namespace Format;
     template<typename ... Args>
     string format(string const &format, Args ... args) {
         formatType x;
+        x.length = lengthNull;
+        x.spec = u;
         string answer = toString(false, x, format, args...);
         return answer;
     }
