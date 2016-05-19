@@ -264,6 +264,7 @@ namespace Format {
             if (format[formatIndex] == '%' && getSpecifier(format) == none) {
                 throw std::invalid_argument("wrong format");
             }
+            formatIndex--;
             if (format[formatIndex] == '\0') {
                 return answer;
             }
