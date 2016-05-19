@@ -50,7 +50,8 @@ namespace Format {
         s,
         u,
         x,
-        X
+        X,
+        none
     };
 
     struct formatType {
@@ -85,30 +86,33 @@ namespace Format {
     string intToString(formatType prototype, T number) {
         string stringNumber;
         char *charNumber = new char[20];
+        string mod = "";
+        if (prototype.sharp)
+            mod = "#";
         switch (prototype.length) {
             case hh:
-                snprintf(charNumber, 20, "%hhd", number);
+                snprintf(charNumber, 20, ("%" + mod + "hhd").c_str(), number);
                 break;
             case h:
-                snprintf(charNumber, 20, "%hd", number);
+                snprintf(charNumber, 20, ("%" + mod + "hd").c_str(), number);
                 break;
             case l:
-                snprintf(charNumber, 20, "%ld", number);
+                snprintf(charNumber, 20, ("%" + mod + "ld").c_str(), number);
                 break;
             case ll:
-                snprintf(charNumber, 20, "%lld", number);
+                snprintf(charNumber, 20, ("%" + mod + "lld").c_str(), number);
                 break;
             case j:
-                snprintf(charNumber, 20, "%jd", number);
+                snprintf(charNumber, 20, ("%" + mod + "jd").c_str(), number);
                 break;
             case z:
-                snprintf(charNumber, 20, "%zd", number);
+                snprintf(charNumber, 20, ("%" + mod + "zd").c_str(), number);
                 break;
             case t:
-                snprintf(charNumber, 20, "%td", number);
+                snprintf(charNumber, 20, ("%" + mod + "td").c_str(), number);
                 break;
             default:
-                snprintf(charNumber, 20, "%d", number);
+                snprintf(charNumber, 20, ("%" + mod + "d").c_str(), number);
         }
         stringNumber = charNumber;
         return stringNumber;
@@ -359,7 +363,8 @@ namespace Format {
             answer += starPower(prototype, format, first, args...);
             return answer;
         }
-        answer += stringComposer(prototype, first);
+        if (!(prototype.precision == 0 && first == 0))
+            answer += stringComposer(prototype, first);
         answer += toString(false, prototype, format, args...);
 
         return answer;
@@ -389,6 +394,19 @@ namespace Format {
 }
 
 using namespace Format;
+
+/**
+ * returns string formatted according to the format string in the same way as in printf
+ *
+ * @param   args
+ *          Arguments declared in format string by special symbols
+ *
+ * @throws  std::invalid_argument
+ *          Thrown when the function gets an argument with wrong type
+ *
+ * @throws  std::out_of_range
+ *          Thrown when there are not enough arguments
+ */
 
     template<typename ... Args>
     string format(string const &format, Args ... args) {
