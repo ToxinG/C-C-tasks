@@ -11,6 +11,8 @@
 #include <sstream>
 #include <stdexcept>
 #include <string>
+#include <type_traits>
+#include <typeinfo>
 
 using namespace std;
 
@@ -314,12 +316,22 @@ namespace Format {
         //cout << prototype.width << endl;
         //cout << prototype.spec << endl;
         if (prototype.width == -42) {
-            prototype.width = first;
-            answer += toString(true, prototype, format, args...);
+            if (std::is_convertible<T, int>::value) {
+                prototype.width = first;
+                answer += toString(true, prototype, format, args...);
+                return answer;
+            }
+            else
+                throw std::invalid_argument("Error: invalid argument. Width of a substring should be a number.");
         }
         if (prototype.precision == -42) {
-            prototype.precision = first;
-            answer += toString(true, prototype, format, args...);
+            if (std::is_convertible<T, int>::value) {
+                prototype.precision = first;
+                answer += toString(true, prototype, format, args...);
+                return answer;
+            }
+            else
+                throw std::invalid_argument("Error: invalid argument. Precision of a number should be a number.");
         }
 
         answer += writeVar(prototype, first);
@@ -336,6 +348,7 @@ using namespace Format;
         formatType x;
         x.length = lengthNull;
         x.spec = u;
+        index = 0;
         string answer = toString(false, x, format, args...);
         return answer;
     }
