@@ -257,6 +257,7 @@ namespace Format {
                 answer += "%";
                 formatIndex += 2;
             }
+            formatIndex++;
             if (format[formatIndex] == '%' && getSpecifier(format) != none) {
                 throw std::out_of_range("not enough arguments");
             }
