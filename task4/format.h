@@ -18,7 +18,7 @@ using namespace std;
 
 namespace Format {
 
-    extern int index;
+    extern int formatIndex;
 
     enum formatLength {
         h,
@@ -299,16 +299,16 @@ namespace Format {
         string answer = "";
         if (!starMode) {
             while (true) { //prints symbols before next "%"
-                if (format[index] == '%' && format[index + 1] == '%') {
+                if (format[formatIndex] == '%' && format[formatIndex + 1] == '%') {
                     answer += "%";
-                    index += 2;
+                    formatIndex += 2;
                 }
-                if (format[index] == '%' && format[index + 1] != '%') {
+                if (format[formatIndex] == '%' && format[formatIndex + 1] != '%') {
                     break;
                 }
-                answer += format[index];
-                index++;
-                if (index == format.length())
+                answer += format[formatIndex];
+                formatIndex++;
+                if (formatIndex == format.length())
                     return answer;
             }
             prototype = readFormat(format);
@@ -348,7 +348,7 @@ using namespace Format;
         formatType x;
         x.length = lengthNull;
         x.spec = u;
-        index = 0;
+        formatIndex = 0;
         string answer = toString(false, x, format, args...);
         return answer;
     }
