@@ -169,7 +169,7 @@ namespace Format {
         return answer;
     }
 
-    string lvlOfString(formatType prototype, string stringNumber) {
+    string stringModifier(formatType prototype, string stringNumber) {
         string answer;
         if (prototype.positive) {
             if (stringNumber[0] != '-') {
@@ -239,6 +239,10 @@ namespace Format {
         return answer;
     }
 
+    string stringComposer(formatType prototype, string variable) {
+        return stringModifier(prototype, variable);
+    }
+
     string toString(bool starMode, formatType prototype, string const &format) {
         string answer;
         while (true) { //prints symbols before next "%"
@@ -252,5 +256,9 @@ namespace Format {
             answer += format[formatIndex];
             formatIndex++;
         }
+    }
+
+    string starPower(formatType prototype, string const &format) {
+        throw std::out_of_range("Error: not enough arguments.");
     }
 }
