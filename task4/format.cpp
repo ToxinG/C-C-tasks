@@ -154,7 +154,7 @@ namespace Format {
                 formatIndex++;
                 return n;
             default:
-                throw invalid_argument("Error: wrong specifier");
+                return none;
         }
     }
 
@@ -171,7 +171,9 @@ namespace Format {
 
     string stringModifier(formatType prototype, string stringNumber) {
         string answer;
-        if (prototype.positive) {
+        bool condition = prototype.spec == d || prototype.spec == i || prototype.spec == f || prototype.spec == F || prototype.spec == E || prototype.spec == e
+                    || prototype.spec == g || prototype.spec == G || prototype.spec == a || prototype.spec == A;
+        if (prototype.positive && condition) {
             if (stringNumber[0] != '-') {
                 stringNumber = "+" + stringNumber;
             }
@@ -182,7 +184,8 @@ namespace Format {
             length--;
         }
 
-        if (prototype.precision > length) {
+        condition = prototype.spec == g || prototype.spec == G || prototype.spec == c || prototype.spec == s;
+        if (prototype.precision > length && !condition) {
             if (stringNumber[0] == '+' || stringNumber[0] == '-') {
                 answer += stringNumber[0];
             }
@@ -206,38 +209,42 @@ namespace Format {
                     answer = answer + " ";
                 }
             }
-            if (prototype.zero) {
-                if (!(prototype.spec == d || prototype.spec == i || prototype.spec == o ||
-                      prototype.spec == u || prototype.spec == x || prototype.spec == X) || prototype.precision == -1) {
+            condition = prototype.spec == s || prototype.spec == c;
+            if (prototype.zero && !condition) {
+                condition = prototype.spec == d || prototype.spec == i || prototype.spec == o ||
+                            prototype.spec == u || prototype.spec == x || prototype.spec == X;
+                if (!condition || prototype.precision == -1) {
                     if (0 < prototype.width - answer.length()) {
                         if (stringNumber[0] == '+' || stringNumber[0] == '-') {
                             answer = stringNumber[0];
+                        } else {
+                            answer = "";
                         }
                         for (int j = 0; j < prototype.width - stringNumber.length(); j++) {
-                            answer = "0" + answer;
+                            answer = answer + "0";
                         }
-/*                        for (int j = 0; j < stringNumber.length(); j++) {
+                        for (int j = 0; j < stringNumber.length(); j++) {
                             if (stringNumber[j] == '+' || stringNumber[j] == '-') {
                                 continue;
                             }
                             answer += stringNumber[j];
-                        } */
+                        }
                     }
                 }
             }
-
-            for (; 0 < prototype.width - answer.length();) {
+            while (0 < (int) (prototype.width - answer.length())) {
                 answer = " " + answer;
             }
         }
 
         if (prototype.space) {
-            if (stringNumber[0] != '+' && stringNumber[0] != '-') {
+            if (stringNumber[0] != '+' && stringNumber[0] != '-' && answer[0] != ' ') {
                 answer = " " + answer;
             }
         }
         return answer;
     }
+
 
     string stringComposer(formatType prototype, string variable) {
         return stringModifier(prototype, variable);
@@ -250,7 +257,13 @@ namespace Format {
                 answer += "%";
                 formatIndex += 2;
             }
-            if (formatIndex == format.length()) {
+            if (format[formatIndex] == '%' && getSpecifier(format) != none) {
+                throw std::out_of_range("not enough arguments");
+            }
+            if (format[formatIndex] == '%' && getSpecifier(format) == none) {
+                throw std::invalid_argument("wrong format");
+            }
+            if (format[formatIndex] == '\0') {
                 return answer;
             }
             answer += format[formatIndex];
