@@ -3,36 +3,38 @@
 #include <cstdlib>
 #include <sstream>
 #include <stdexcept>
+#include <type_traits>
+#include <typeinfo>
 #include "format.h"
 
 using namespace std;
 
 namespace Format {
 
-    int index = 0;
+    int formatIndex;
 
     void getFlag(formatType *prototype, string const &format) {
         while (true) {
-            switch (format[index]) {
+            switch (format[formatIndex]) {
                 case '-':
                     prototype->negative = 1;
-                    index++;
+                    formatIndex++;
                     break;
                 case '+':
                     prototype->positive = 1;
-                    index++;
+                    formatIndex++;
                     break;
                 case ' ':
                     prototype->space = 1;
-                    index++;
+                    formatIndex++;
                     break;
                 case '#':
                     prototype->sharp = 1;
-                    index++;
+                    formatIndex++;
                     break;
                 case '0':
                     prototype->zero = 1;
-                    index++;
+                    formatIndex++;
                     break;
                 default:
                     return;
@@ -41,54 +43,54 @@ namespace Format {
     }
 
     int getNumber(string const &format) {
-        int answer = 0; //(!) (!) (!) (!) (!) (!) (!) (!) (!) (!) (!) (!) (!) (!) (!) (!) (!) (!) (!) (!) (!) (!) (!)
-        if (format[index] == '*') {
-            index++;
+        int answer = 0; //(!) (!) (!) (!)
+        if (format[formatIndex] == '*') {
+            formatIndex++;
             return -42;
         }
 
-        while (isdigit(format[index])) {
-            answer = answer * 10 + (format[index] - '0');
-            index++;
+        while (isdigit(format[formatIndex])) {
+            answer = answer * 10 + (format[formatIndex] - '0');
+            formatIndex++;
         }
         return answer;
     }
 
     int getPrecision(string const &format) {
-        if (format[index] != '.') {
+        if (format[formatIndex] != '.') {
             return -1;
         }
-        index++;
+        formatIndex++;
         return getNumber(format);
     }
 
     formatLength getLength(string const &format) {
-        if (format[index] == 'h' && format[index + 1] == 'h') {
-            index += 2;
+        if (format[formatIndex] == 'h' && format[formatIndex + 1] == 'h') {
+            formatIndex += 2;
             return hh;
         }
-        if (format[index] == 'l' && format[index + 1] == 'l') {
-            index += 2;
+        if (format[formatIndex] == 'l' && format[formatIndex + 1] == 'l') {
+            formatIndex += 2;
             return ll;
         }
-        switch (format[index]) {
+        switch (format[formatIndex]) {
             case 'l':
-                index++;
+                formatIndex++;
                 return l;
             case 'h':
-                index++;
+                formatIndex++;
                 return h;
             case 'j':
-                index++;
+                formatIndex++;
                 return j;
             case 'z':
-                index++;
+                formatIndex++;
                 return z;
             case 't':
-                index++;
+                formatIndex++;
                 return t;
             case 'L':
-                index++;
+                formatIndex++;
                 return L;
             default:
                 return lengthNull;
@@ -96,60 +98,60 @@ namespace Format {
     }
 
     formatSpecifier getSpecifier(string const &format) {
-        switch (format[index]) {
+        switch (format[formatIndex]) {
             case 'd':
-                index++;
+                formatIndex++;
                 return d;
             case 'i':
-                index++;
+                formatIndex++;
                 return i;
             case 'u':
-                index++;
+                formatIndex++;
                 return u;
             case 'o':
-                index++;
+                formatIndex++;
                 return o;
             case 'x':
-                index++;
+                formatIndex++;
                 return x;
             case 'X':
-                index++;
+                formatIndex++;
                 return X;
             case 'f':
-                index++;
+                formatIndex++;
                 return f;
             case 'F':
-                index++;
+                formatIndex++;
                 return F;
             case 'e':
-                index++;
+                formatIndex++;
                 return e;
             case 'E':
-                index++;
+                formatIndex++;
                 return E;
             case 'g':
-                index++;
+                formatIndex++;
                 return g;
             case 'G':
-                index++;
+                formatIndex++;
                 return G;
             case 'a':
-                index++;
+                formatIndex++;
                 return a;
             case 'A':
-                index++;
+                formatIndex++;
                 return A;
             case 'c':
-                index++;
+                formatIndex++;
                 return c;
             case 's':
-                index++;
+                formatIndex++;
                 return s;
             case 'p':
-                index++;
+                formatIndex++;
                 return p;
             case 'n':
-                index++;
+                formatIndex++;
                 return n;
             default:
                 throw invalid_argument("Error: wrong specifier");
@@ -158,7 +160,7 @@ namespace Format {
 
     formatType readFormat(string const &format) {
         formatType answer;
-        index++;
+        formatIndex++;
         getFlag(&answer, format);
         answer.width = getNumber(format);
         answer.precision = getPrecision(format);
@@ -212,14 +214,14 @@ namespace Format {
                             answer = stringNumber[0];
                         }
                         for (int j = 0; j < prototype.width - stringNumber.length(); j++) {
-                            answer = answer + "0";
+                            answer = "0" + answer;
                         }
-                        for (int j = 0; j < stringNumber.length(); j++) {
+/*                        for (int j = 0; j < stringNumber.length(); j++) {
                             if (stringNumber[j] == '+' || stringNumber[j] == '-') {
                                 continue;
                             }
                             answer += stringNumber[j];
-                        }
+                        } */
                     }
                 }
             }
@@ -239,16 +241,16 @@ namespace Format {
 
     string toString(bool starMode, formatType prototype, string const &format) {
         string answer;
-        while (true) { //вывод все что перед процентом
-            if (format[index] == '%' && format[index + 1] == '%') {
+        while (true) { //prints symbols before next "%"
+            if (format[formatIndex] == '%' && format[formatIndex + 1] == '%') {
                 answer += "%";
-                index += 2;
+                formatIndex += 2;
             }
-            if (index == format.length()) {
+            if (formatIndex == format.length()) {
                 return answer;
             }
-            answer += format[index];
-            index++;
+            answer += format[formatIndex];
+            formatIndex++;
         }
     }
 }
