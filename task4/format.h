@@ -75,9 +75,11 @@ namespace Format {
 
     formatSpecifier getSpecifier(string const &format);
 
+    //gets flags, width, precision, length and specifier from the format string
     formatType readFormat(string const &format);
 
-    string lvlOfString(formatType prototype, string stringNumber);
+    //modifies the printable string according to flags, width, and precision
+    string stringModifier(formatType prototype, string stringNumber);
 
     template<typename T>
     string intToString(formatType prototype, T number) {
@@ -267,31 +269,65 @@ namespace Format {
         return stringNumber;
     }
 
+    //makes string representation of printable value
+    string stringComposer(formatType prototype, string variable);
+
     template<typename T>
-    string writeVar(formatType prototype, T variable) {
+    typename std::enable_if<(std::is_convertible<T, string>::value), string>::type
+    stringComposer(formatType prototype, T variable) {
+        if (prototype.spec == p) {
+            string stringNumber;
+            char *charNumber = new char[1024];
+            snprintf(charNumber, 1024, "%p", variable);
+            stringNumber = charNumber;
+            return stringNumber;
+        }
+        if (prototype.spec == s) {
+            string stringNumber = variable;
+            return stringModifier(prototype, stringNumber);
+        } else {
+            throw std::invalid_argument("Invalid argument: string expected.");
+        }
+    }
+
+    template<typename T>
+    typename std::enable_if<(!(std::is_convertible<T, string>::value) && (std::is_pointer<T>::value)), string>::type
+    stringComposer(formatType prototype, T variable) {
         string stringNumber;
+        char *charNumber = new char[1024];
+        snprintf(charNumber, 1024, "%p", variable);
+        stringNumber = charNumber;
+        return stringNumber;
+    }
+
+    template<typename T>
+    typename std::enable_if<!(std::is_convertible<T, string>::value) && !(std::is_pointer<T>::value), string>::type
+    stringComposer(formatType prototype, T variable) {
+        string stringNumber;
+        if (!is_convertible<T, int>::value) {
+            throw std::invalid_argument("Invalid argument.");
+        }
         if (prototype.spec == d || prototype.spec == i) {
             stringNumber = intToString(prototype, variable);
-            return lvlOfString(prototype, stringNumber);
+            return stringModifier(prototype, stringNumber);
         }
         if (prototype.spec == u || prototype.spec == o || prototype.spec == x || prototype.spec == X) {
             stringNumber = unsignedVar(prototype, variable);
-            return lvlOfString(prototype, stringNumber);
+            return stringModifier(prototype, stringNumber);
         }
         if (prototype.spec == f || prototype.spec == F || prototype.spec == e || prototype.spec == E ||
             prototype.spec == g || prototype.spec == G || prototype.spec == a || prototype.spec == A) {
             stringNumber = floatNumbers(prototype, variable);
-            return lvlOfString(prototype, stringNumber);
+            return stringModifier(prototype, stringNumber);
         }
         if (prototype.spec == c) {
             stringNumber += variable;
-            return lvlOfString(prototype, stringNumber);
+            return stringModifier(prototype, stringNumber);
         }
-        if (prototype.spec == s) {
-            return lvlOfString(prototype, stringNumber);
-        }
+        throw std::invalid_argument("Invalid argument.");
     }
 
+    //basic function that processes the format string and gets the result according to it
     string toString(bool starMode, formatType prototype, string const &format);
 
     template<typename T, typename... Args>
@@ -316,28 +352,39 @@ namespace Format {
         //cout << prototype.width << endl;
         //cout << prototype.spec << endl;
         if (prototype.width == -42) {
-            if (std::is_convertible<T, int>::value) {
-                prototype.width = first;
-                answer += toString(true, prototype, format, args...);
-                return answer;
-            }
-            else
-                throw std::invalid_argument("Error: invalid argument. Width of a substring should be a number.");
+            answer += starPower(prototype, format, first, args...);
+            return answer;
         }
         if (prototype.precision == -42) {
-            if (std::is_convertible<T, int>::value) {
-                prototype.precision = first;
-                answer += toString(true, prototype, format, args...);
-                return answer;
-            }
-            else
-                throw std::invalid_argument("Error: invalid argument. Precision of a number should be a number.");
+            answer += starPower(prototype, format, first, args...);
+            return answer;
         }
-
-        answer += writeVar(prototype, first);
+        answer += stringComposer(prototype, first);
         answer += toString(false, prototype, format, args...);
 
         return answer;
+    };
+
+    //corrects the work of toString if "*" is used in the format string
+    string starPower(formatType prototype, string const &format);
+
+    template<typename T, typename... Args>
+    typename std::enable_if<(std::is_convertible<T, int>::value), string>::type
+    starPower(formatType prototype, string const &format, T first, Args ... args) {
+        if (prototype.width == -42) {
+            prototype.width = first;
+            return toString(true, prototype, format, args...);
+        }
+        if (prototype.precision == -42) {
+            prototype.precision = first;
+            return toString(true, prototype, format, args...);
+        }
+    };
+
+    template<typename T, typename... Args>
+    typename std::enable_if<!(std::is_convertible<T, int>::value), string>::type
+    starPower(formatType prototype, string const &format, T first, Args ... args) {
+        throw std::invalid_argument("Error: when \"*\" is used width or precision should be expressed with a number.");
     };
 }
 
