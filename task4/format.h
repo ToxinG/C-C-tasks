@@ -311,6 +311,8 @@ namespace Format {
         if (!is_convertible<T, int>::value) {
             throw std::invalid_argument("Invalid argument.");
         }
+        if (prototype.precision == 0 && variable == 0)
+            return "";
         if (prototype.spec == d || prototype.spec == i) {
             stringNumber = intToString(prototype, variable);
             return stringModifier(prototype, stringNumber);
@@ -346,10 +348,15 @@ namespace Format {
                 if (format[formatIndex] == '%' && format[formatIndex + 1] != '%') {
                     break;
                 }
+                if (format[formatIndex] == '\0') {
+                    if (format.size() == 0 || formatIndex == format.size()) {
+                        throw std::invalid_argument("Too many arguments.");
+                    }
+                    answer += format[formatIndex];
+                    return answer;
+                }
                 answer += format[formatIndex];
                 formatIndex++;
-                if (formatIndex == format.length())
-                    return answer;
             }
             prototype = readFormat(format);
         }
@@ -363,8 +370,7 @@ namespace Format {
             answer += starPower(prototype, format, first, args...);
             return answer;
         }
-        if (!(prototype.precision == 0 && first == 0))
-            answer += stringComposer(prototype, first);
+        answer += stringComposer(prototype, first);
         answer += toString(false, prototype, format, args...);
 
         return answer;
