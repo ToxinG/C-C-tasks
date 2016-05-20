@@ -274,14 +274,58 @@ namespace Format {
         return stringNumber;
     }
 
-    //makes string representation of printable value
-    string stringComposer(formatType prototype, string variable);
+    string atComposer(nullptr_t variable);
 
     template<typename T>
-    typename std::enable_if<(std::is_convertible<T, nullptr_t>::value), string>::type
-    stringComposer(formatType prototype, T variable) {
-        return "nullptr";
+    typename std::enable_if<std::is_integral<T>::value, string>::type
+    atComposer(T variable) {
+        return std::to_string(variable);
     }
+
+    template<typename T, int num>
+    typename std::enable_if<!std::is_convertible<T*, string>::value, string>::type
+    atComposer(const T (&a)[num]) {
+        std::string r = "[";
+        for(int i = 0; i < num - 1; i++){
+            r += (std::to_string(a[i]) + ",");
+        }
+        r += (std::to_string(a[num - 1]) + ']');
+        return r;
+    }
+
+    template<typename T>
+    typename std::enable_if<std::is_convertible<T, string>::value, string>::type
+    atComposer(const T& variable){
+        return variable;
+    }
+
+    template<typename T>
+    typename std::enable_if<!std::is_array<T>::value && !std::is_convertible<T, string>::value &&
+            std::is_pointer<T>::value, string>::type
+    atComposer(T& variable){
+        std::string r;
+        std::string type = typeid(*variable).name();
+        if(type == "i"){
+            type = "int";
+        } else if(type == "Ss"){
+            type = "std::string";
+        }
+        if(variable == 0){
+            r.append("nullptr<").append(type).append(">");
+        } else {
+            r.append("ptr<").append(type).append(">(").append(format("%@", *variable)).append(")");
+        }
+        return r;
+    }
+
+    template<typename T>
+    typename std::enable_if<!std::is_integral<T>::value && !std::is_convertible<T, string>::value &&
+            !std::is_pointer<T>::value, string>::type print_at(const T& value){
+        throw std::invalid_argument("Invalid argument type.");
+    }
+
+    //makes string representation of printable value
+    string stringComposer(formatType prototype, string variable);
 
     template<typename T>
     typename std::enable_if<(std::is_convertible<T, string>::value), string>::type
@@ -295,11 +339,6 @@ namespace Format {
         }
         if (prototype.spec == s) {
             string stringNumber = variable;
-            return stringModifier(prototype, stringNumber);
-        }
-        if (prototype.spec == doge) {
-            string stringNumber = (string) variable;
-            prototype.spec = s;
             return stringModifier(prototype, stringNumber);
         }
         else {
@@ -383,7 +422,10 @@ namespace Format {
             answer += starPower(prototype, format, first, args...);
             return answer;
         }
-        answer += stringComposer(prototype, first);
+        if (prototype.spec == doge)
+            answer += atComposer(first);
+        else
+            answer += stringComposer(prototype, first);
         answer += toString(false, prototype, format, args...);
 
         return answer;
@@ -416,6 +458,7 @@ using namespace Format;
 
 /**
  * returns string formatted according to the format string in the same way as in printf
+ * with a modification: @ specifier for work with pointers
  *
  * @param   args
  *          Arguments declared in format string by special symbols
