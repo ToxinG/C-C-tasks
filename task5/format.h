@@ -276,7 +276,7 @@ namespace Format {
 
     string atComposer(nullptr_t variable);
 
-    template<typename T>
+/*    template<typename T>
     typename std::enable_if<std::is_integral<T>::value, string>::type
     atComposer(T variable) {
         return std::to_string(variable);
@@ -292,7 +292,7 @@ namespace Format {
         r += (std::to_string(a[num - 1]) + ']');
         return r;
     }
-
+*/
     template<typename T>
     typename std::enable_if<std::is_convertible<T, string>::value, string>::type
     atComposer(const T& variable){
@@ -458,7 +458,6 @@ using namespace Format;
 
 /**
  * returns string formatted according to the format string in the same way as in printf
- * with a modification: @ specifier for work with pointers
  *
  * @param   args
  *          Arguments declared in format string by special symbols
