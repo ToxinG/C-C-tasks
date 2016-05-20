@@ -422,9 +422,9 @@ namespace Format {
             answer += starPower(prototype, format, first, args...);
             return answer;
         }
-        if (prototype.spec == doge)
+/*        if (prototype.spec == doge)
             answer += atComposer(first);
-        else
+        else */
             answer += stringComposer(prototype, first);
         answer += toString(false, prototype, format, args...);
 
@@ -458,6 +458,7 @@ using namespace Format;
 
 /**
  * returns string formatted according to the format string in the same way as in printf
+ * modification: new specifier @ for pointers processing
  *
  * @param   args
  *          Arguments declared in format string by special symbols
