@@ -278,6 +278,12 @@ namespace Format {
     string stringComposer(formatType prototype, string variable);
 
     template<typename T>
+    typename std::enable_if<(std::is_convertible<T, nullptr_t>::value), string>::type
+    stringComposer(formatType prototype, T variable) {
+        return "nullptr";
+    }
+
+    template<typename T>
     typename std::enable_if<(std::is_convertible<T, string>::value), string>::type
     stringComposer(formatType prototype, T variable) {
         if (prototype.spec == p) {
@@ -290,7 +296,13 @@ namespace Format {
         if (prototype.spec == s) {
             string stringNumber = variable;
             return stringModifier(prototype, stringNumber);
-        } else {
+        }
+        if (prototype.spec == doge) {
+            string stringNumber = (string) variable;
+            prototype.spec = s;
+            return stringModifier(prototype, stringNumber);
+        }
+        else {
             throw std::invalid_argument("Invalid argument: string expected.");
         }
     }
