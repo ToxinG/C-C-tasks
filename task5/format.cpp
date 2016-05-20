@@ -248,6 +248,9 @@ namespace Format {
         return answer;
     }
 
+    string atComposer(nullptr_t value) {
+        return "nullptr";
+    }
 
     string stringComposer(formatType prototype, string variable) {
         return stringModifier(prototype, variable);
