@@ -276,7 +276,7 @@ namespace Format {
 
     string atComposer(nullptr_t variable);
 
-/*    template<typename T>
+    template<typename T>
     typename std::enable_if<std::is_integral<T>::value, string>::type
     atComposer(T variable) {
         return std::to_string(variable);
@@ -292,7 +292,7 @@ namespace Format {
         r += (std::to_string(a[num - 1]) + ']');
         return r;
     }
-*/
+
     template<typename T>
     typename std::enable_if<std::is_convertible<T, string>::value, string>::type
     atComposer(const T& variable){
@@ -300,8 +300,8 @@ namespace Format {
     }
 
     template<typename T>
-    typename std::enable_if<!std::is_array<T>::value && !std::is_convertible<T, string>::value &&
-            std::is_pointer<T>::value, string>::type
+    typename std::enable_if<!std::is_array<T>::value &&
+            !std::is_convertible<T, string>::value && std::is_pointer<T>::value, string>::type
     atComposer(T& variable){
         std::string r;
         std::string type = typeid(*variable).name();
@@ -319,8 +319,9 @@ namespace Format {
     }
 
     template<typename T>
-    typename std::enable_if<!std::is_integral<T>::value && !std::is_convertible<T, string>::value &&
-            !std::is_pointer<T>::value, string>::type print_at(const T& value){
+    typename std::enable_if<!std::is_integral<T>::value &&
+            !std::is_convertible<T, string>::value && !std::is_pointer<T>::value, string>::type
+    atComposer(const T& variable){
         throw std::invalid_argument("Invalid argument type.");
     }
 
@@ -422,9 +423,9 @@ namespace Format {
             answer += starPower(prototype, format, first, args...);
             return answer;
         }
-/*        if (prototype.spec == doge)
+        if (prototype.spec == doge)
             answer += atComposer(first);
-        else */
+        else
             answer += stringComposer(prototype, first);
         answer += toString(false, prototype, format, args...);
 
