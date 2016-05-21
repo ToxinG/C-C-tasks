@@ -248,7 +248,7 @@ namespace Format {
         return answer;
     }
 
-    string atComposer(nullptr_t value) {
+    string atComposer(nullptr_t variable) {
         return "nullptr";
     }
 
