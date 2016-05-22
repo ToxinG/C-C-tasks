@@ -1,3 +1,4 @@
+//6:55 today is almost yesterdsy...
 //
 // Created by Антон on 16.04.2016.
 //
@@ -274,6 +275,7 @@ namespace Format {
         return stringNumber;
     }
 
+    //makes string representation of printable value when the specifier is @
     string atComposer(nullptr_t variable);
 
     template<typename T>
@@ -329,7 +331,7 @@ namespace Format {
         return r;
     }
 
-    //makes string representation of printable value
+    //makes string representation of printable value for other specifiers (not @)
     string stringComposer(formatType prototype, string variable);
 
     template<typename T>
