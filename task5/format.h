@@ -394,7 +394,7 @@ namespace Format {
     string toString(bool starMode, formatType prototype, string const &format);
 
     template<typename T, typename... Args>
-    string toString(bool starMode, formatType prototype, string const &format, T first, Args ... args) {
+    string toString(bool starMode, formatType prototype, string const &format, const T &first, const Args &... args) {
         string answer = "";
         if (!starMode) {
             while (true) { //prints symbols before next "%"
