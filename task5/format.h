@@ -277,20 +277,20 @@ namespace Format {
     string atComposer(nullptr_t variable);
 
     template<typename T>
-    typename std::enable_if<!std::is_integral<T>::value &&
-                            !std::is_convertible<T, string>::value && !std::is_pointer<T>::value, string>::type
+    typename std::enable_if<!std::is_integral<T>::value && 
+    !std::is_convertible<T, std::string>::value && !std::is_pointer<T>::value, std::string>::type
     atComposer(const T& variable){
         throw std::invalid_argument("Invalid argument type.");
     }
 
     template<typename T>
-    typename std::enable_if<(std::is_integral<T>::value), string>::type
+    typename std::enable_if<std::is_integral<T>::value, std::string>::type
     atComposer(T variable) {
         return std::to_string(variable);
     }
 
-	template<typename T, int num> 
-	typename std::enable_if<!std::is_convertible<T*, std::string>::value, std::string>::type
+    template<typename T, int num> 
+    typename std::enable_if<!std::is_convertible<T*, std::string>::value, std::string>::type
     atComposer(const T (&a)[num]) {
         std::string r = "[";
         for(int i = 0; i < num - 1; i++){
@@ -301,14 +301,14 @@ namespace Format {
     }
 
     template<typename T>
-    typename std::enable_if<(std::is_convertible<T, string>::value), string>::type
+    typename std::enable_if<std::is_convertible<T, std::string>::value, std::string>::type
     atComposer(const T& variable){
         return variable;
     }
 
     template<typename T>
-    typename std::enable_if<((!std::is_array<T>::value) &&
-            (!std::is_convertible<T, string>::value) && (std::is_pointer<T>::value)), string>::type
+    typename std::enable_if<!std::is_array<T>::value && !std::is_convertible<T, std::string>::value 
+    && std::is_pointer<T>::value, std::string>::type
     atComposer(T& variable){
         std::string r;
         std::string type = typeid(*variable).name();
