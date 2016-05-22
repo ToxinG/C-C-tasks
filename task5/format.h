@@ -476,7 +476,7 @@ using namespace Format;
  */
 
 template<typename ... Args>
-string format(const string &format, Args ... args) {
+string format(const string &format, const Args &... args) {
     formatType x;
     x.length = lengthNull;
     x.spec = u;
