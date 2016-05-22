@@ -277,19 +277,26 @@ namespace Format {
     string atComposer(nullptr_t variable);
 
     template<typename T>
+    typename std::enable_if<!std::is_integral<T>::value &&
+                            !std::is_convertible<T, string>::value && !std::is_pointer<T>::value, string>::type
+    atComposer(const T& variable){
+        throw std::invalid_argument("Invalid argument type.");
+    }
+
+    template<typename T>
     typename std::enable_if<(std::is_integral<T>::value), string>::type
     atComposer(T variable) {
         return std::to_string(variable);
     }
 
     template<typename T, int num>
-    typename std::enable_if<!(std::is_convertible<T*, string>::value), string>::type
+    typename std::enable_if<!(std::is_convertible<T*, std::string>::value), std::string>::type
     atComposer(const T (&a)[num]) {
         std::string r = "[";
         for(int i = 0; i < num - 1; i++){
-            r += (std::to_string(a[i]) + ",");
+            r.append(std::to_string(a[i]) + ",");
         }
-        r += (std::to_string(a[num - 1]) + ']');
+        r.append(std::to_string(a[num - 1]) + ']');
         return r;
     }
 
@@ -320,13 +327,6 @@ namespace Format {
             r.append("ptr<").append(type).append(">(").append(toString(false, k, "%@", *variable)).append(")");
         }
         return r;
-    }
-
-    template<typename T>
-    typename std::enable_if<!std::is_integral<T>::value &&
-            !std::is_convertible<T, string>::value && !std::is_pointer<T>::value, string>::type
-    atComposer(const T& variable){
-        throw std::invalid_argument("Invalid argument type.");
     }
 
     //makes string representation of printable value
