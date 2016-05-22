@@ -289,8 +289,8 @@ namespace Format {
         return std::to_string(variable);
     }
 
-    template<typename T, int num>
-    typename std::enable_if<(std::is_array<T>::value), std::string>::type
+	template<typename T, int num> 
+	typename std::enable_if<!std::is_convertible<T*, std::string>::value, std::string>::type
     atComposer(const T (&a)[num]) {
         std::string r = "[";
         for(int i = 0; i < num - 1; i++){
