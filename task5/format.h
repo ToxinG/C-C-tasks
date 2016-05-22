@@ -277,13 +277,13 @@ namespace Format {
     string atComposer(nullptr_t variable);
 
     template<typename T>
-    typename std::enable_if<std::is_integral<T>::value, string>::type
+    typename std::enable_if<(std::is_integral<T>::value), string>::type
     atComposer(T variable) {
         return std::to_string(variable);
     }
 
     template<typename T, int num>
-    typename std::enable_if<!std::is_convertible<T*, string>::value, string>::type
+    typename std::enable_if<!(std::is_convertible<T, string>::value), string>::type
     atComposer(const T (&a)[num]) {
         std::string r = "[";
         for(int i = 0; i < num - 1; i++){
@@ -294,14 +294,14 @@ namespace Format {
     }
 
     template<typename T>
-    typename std::enable_if<std::is_convertible<T, string>::value, string>::type
+    typename std::enable_if<(std::is_convertible<T, string>::value), string>::type
     atComposer(const T& variable){
         return variable;
     }
 
     template<typename T>
-    typename std::enable_if<!std::is_array<T>::value &&
-            !std::is_convertible<T, string>::value && std::is_pointer<T>::value, string>::type
+    typename std::enable_if<((!std::is_array<T>::value) &&
+            (!std::is_convertible<T, string>::value) && (std::is_pointer<T>::value)), string>::type
     atComposer(T& variable){
         std::string r;
         std::string type = typeid(*variable).name();
@@ -313,7 +313,11 @@ namespace Format {
         if(variable == 0){
             r.append("nullptr<").append(type).append(">");
         } else {
-            r.append("ptr<").append(type).append(">(").append(format("%@", *variable)).append(")");
+            formatType k; // k means kostyl'
+            k.length = lengthNull;
+            k.spec = u;
+            formatIndex = 0;
+            r.append("ptr<").append(type).append(">(").append(toString(false, k, "%@", *variable)).append(")");
         }
         return r;
     }
@@ -471,14 +475,14 @@ using namespace Format;
  *          Thrown when there are not enough arguments
  */
 
-    template<typename ... Args>
-    string format(string const &format, Args ... args) {
-        formatType x;
-        x.length = lengthNull;
-        x.spec = u;
-        formatIndex = 0;
-        string answer = toString(false, x, format, args...);
-        return answer;
-    }
+template<typename ... Args>
+string format(const string &format, Args ... args) {
+    formatType x;
+    x.length = lengthNull;
+    x.spec = u;
+    formatIndex = 0;
+    string answer = toString(false, x, format, args...);
+    return answer;
+};
 
 #endif //TASK4_FORMAT_H
